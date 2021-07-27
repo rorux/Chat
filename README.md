@@ -1,2 +1,2 @@
 # Chat
-Vue3 + Node + MongoDB
+Vue2 + Node + MongoDB
