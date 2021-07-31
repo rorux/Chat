@@ -1,5 +1,5 @@
 <template>
-  <v-app class="grey lighten-4">
+  <v-app>
     <Alert />
     <component :is="layout">
       <router-view></router-view>
@@ -10,7 +10,7 @@
 <script>
 import EmptyLayout from "@/layouts/EmptyLayout";
 import MainLayout from "@/layouts/MainLayout";
-import Alert from '@/components/app/Alert';
+import Alert from "@/components/app/Alert";
 export default {
   computed: {
     layout() {
@@ -20,7 +20,7 @@ export default {
   components: {
     EmptyLayout,
     MainLayout,
-    Alert
+    Alert,
   },
 };
 </script>
