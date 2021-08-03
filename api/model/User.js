@@ -1,6 +1,9 @@
 const {
     model,
     Schema,
+    Schema: {
+      Types: { ObjectId },
+    },
   } = require("mongoose");
   
   const schema = new Schema({
@@ -11,7 +14,11 @@ const {
     password: {
       type: String,
       default: ''
-    }
+    },
+    chats: [{
+      type: ObjectId,
+      ref: "Chat",
+    }]
   });
   
   module.exports = model("User", schema);

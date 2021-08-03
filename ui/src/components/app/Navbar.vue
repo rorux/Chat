@@ -3,7 +3,7 @@
     <v-navigation-drawer
       v-model="drawer"
       app
-      mobile-break-point="650"
+      mobile-breakpoint="650"
       color="#052052"
       class="pa-6"
     >
@@ -34,7 +34,6 @@
             dense
             class="pa-0"
             item-color="primary"
-            filled="true"
             dark
           ></v-select>
           <p class="body-2 text-center blue-grey--text text--darken-0" v-else>
@@ -100,12 +99,6 @@ export default {
       },
       {
         name: "Mike Carlson",
-      },
-      {
-        name: "Cindy Baker",
-      },
-      {
-        name: "Ali Connors",
       },
       {
         name: "Cindy Baker",

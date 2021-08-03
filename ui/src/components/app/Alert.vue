@@ -1,10 +1,5 @@
 <template>
-  <v-snackbar
-    v-model="snackbar"
-    :timeout="timeout"
-    top
-    :color="color"
-  >
+  <v-snackbar v-model="snackbar" :timeout="timeout" top :color="color">
     <p class="text-center ma-0">{{ text }}</p>
   </v-snackbar>
 </template>
@@ -16,7 +11,7 @@ export default {
     snackbar: false,
     timeout: 2500,
     text: "",
-    color: "primary"
+    color: "primary",
   }),
   computed: {
     getError() {
@@ -24,6 +19,9 @@ export default {
     },
     getSuccess() {
       return this.$store.state.success;
+    },
+    getPrimary() {
+      return this.$store.state.primary;
     },
   },
   watch: {
@@ -43,13 +41,17 @@ export default {
         this.clearSuccess();
       }
     },
+    getPrimary(value) {
+      if (value) {
+        this.text = value;
+        this.color = "primary";
+        this.snackbar = true;
+        this.clearPrimary();
+      }
+    },
   },
   methods: {
-    ...mapMutations(["clearError", "clearSuccess"]),
-  }
-}
+    ...mapMutations(["clearError", "clearSuccess", "clearPrimary"]),
+  },
+};
 </script>
-
-<style>
-
-</style>

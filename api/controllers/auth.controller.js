@@ -3,62 +3,72 @@ const bcrypt = require('bcryptjs');
 const { User, Token } = require('../model');
 const { validationResult } = require('express-validator');
 
-const ACCESS_TOKEN_EXPIRE = '10s';
-const REFRESH_TOKEN_EXPIRE = '10s';
+const ACCESS_TOKEN_EXPIRE = '30m';
+const REFRESH_TOKEN_EXPIRE = '1d';
 
 module.exports = {
   async logout({ body: { refreshToken } }, res) {
-    const foundToken = await Token.findOne({ token: refreshToken })
+    try {
+      const foundToken = await Token.findOne({ token: refreshToken })
 
-    if (!foundToken) {
+      if (!foundToken) {
+        return res.status(403).send({
+          message: 'Пользователь не авторизован!'
+        })
+      }
+
+      await Token.findByIdAndDelete(foundToken._id)
+
+      return res.status(200).send({
+        message: 'Пользователь успешно разлогинен!'
+      })
+    } catch (err) {
       return res.status(403).send({
-        message: 'Пользователь не авторизован!'
+        message: 'Что-то пошло не так..'
       })
     }
-
-    await Token.findByIdAndDelete(foundToken._id)
-
-    return res.status(200).send({
-      message: 'Пользователь успешно разлогинен!'
-    })
   },
 
   async refreshToken({ body: { refreshToken } }, res) {
-
-    if (!refreshToken) {
-      return res.status(403).send({
-        message: 'Действие запрещено!'
-      })
-    }
-
-    const currentToken = await Token.findOne({ token: refreshToken })
-
-    if (!currentToken) {
-      return res.status(403).send({
-        message: 'Действие запрещено!'
-      })
-    }
-
-    jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH, (err, user) => {
-      if (err) {
+    try {
+      if (!refreshToken) {
         return res.status(403).send({
           message: 'Действие запрещено!'
         })
       }
 
-      const accessToken = jwt.sign({
-        userId: user._id,
-        login: user.login,
-      }, process.env.JWT_SECRET, {
-        expiresIn: ACCESS_TOKEN_EXPIRE
-      })
+      const currentToken = await Token.findOne({ token: refreshToken });
 
-      return res.status(200).send({
-        accessToken,
-        login: user.login
-      })
+      if (!currentToken) {
+        return res.status(403).send({
+          message: 'Действие запрещено!'
+        })
+      }
 
-    })
+      jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH, (err, user) => {
+        if (err) {
+          return res.status(403).send({
+            message: 'Действие запрещено!'
+          })
+        }
+
+        const accessToken = jwt.sign({
+          userId: user.userId,
+          login: user.login,
+        }, process.env.JWT_SECRET, {
+          expiresIn: ACCESS_TOKEN_EXPIRE
+        });
+
+        return res.status(200).send({
+          accessToken
+        })
+
+      })
+    } catch (err) {
+      return res.status(403).send({
+        message: 'Что-то пошло не так..'
+      })
+    }
   },
 
   async login(req, res) {
@@ -72,7 +82,7 @@ module.exports = {
         })
       }
 
-      const foundUser = await User.findOne({ login })
+      const foundUser = await User.findOne({ login });
 
       if (!foundUser) {
         return res.status(403).send({
@@ -107,7 +117,7 @@ module.exports = {
       })
 
       if (foundToken) {
-        await Token.findByIdAndUpdate(foundToken._id, { token: refreshToken })
+        await Token.findByIdAndUpdate(foundToken._id, { token: refreshToken });
         return res.status(200).send({
           accessToken,
           refreshToken,
@@ -155,7 +165,7 @@ module.exports = {
       await createdUser.save();
 
       return res.status(200).send({
-        message: "Пользователь создан!"
+        message: "Пользователь создан. Войдите в систему!"
       })
 
     } catch (err) {
@@ -163,5 +173,42 @@ module.exports = {
         message: 'Что-то пошло не так..'
       })
     }
-  }
+  },
+
+  async checkToken(req, res, next) {
+    try {
+      const bearer = req.headers['authorization'];
+
+      if(!bearer) {
+        return res.status(403).send({
+          message: 'Действие запрещено!'
+        })
+      }
+
+      const accessToken = bearer.replace(/^Bearer\s+/, "");
+      
+      jwt.verify(accessToken, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+          return res.status(401).send({
+            message: 'Токен не действителен!'
+          });
+        }
+
+        const foundUser = User.findOne({ login: user.login, _id: user.userId });
+
+        if (!foundUser) {
+          return res.status(403).send({
+            message: 'Действие запрещено!'
+          })
+        }
+        
+        res.locals.userId = user.userId;
+        next();
+      });
+    } catch (err) {
+      return res.status(403).send({
+        message: 'Что-то пошло не так..'
+      })
+    }
+  },
 }

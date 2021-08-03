@@ -9,9 +9,16 @@
 
 <script>
 import Navbar from "@/components/app/Navbar";
+import { mapActions } from "vuex";
 export default {
+  methods: {
+    ...mapActions("user", ["getUserInfo"]),
+  },
   components: {
     Navbar,
+  },
+  async created() {
+    await this.getUserInfo();
   },
 };
 </script>
