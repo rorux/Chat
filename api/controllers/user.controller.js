@@ -1,11 +1,12 @@
 const { User, Chat } = require('../model');
+const { validationResult } = require('express-validator');
 
 module.exports = {
   async getInfo(req, res) {
     try {
       const foundUser = await User.findById(res.locals.userId);
       const chats = await Chat.where('_id').in(foundUser.chats);
-      return res.status(200).send({ login: foundUser.login, chats });
+      return res.status(200).send({ userId: foundUser._id, login: foundUser.login, chats });
     } catch (err) {
       return res.status(403).send({
         message: 'Что-то пошло не так..'
@@ -13,13 +14,22 @@ module.exports = {
     }
   },
 
-  async addChat({ body: { name } }, res) {
+  async addChat(req, res) {
     try {
+      const { name } = req.body;
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(422).json({
+          message: errors.array()[0].msg
+        })
+      }
+
       const foundChat = await Chat.findOne({ name });
 
       if (foundChat) {
         return res.status(422).send({
-          message: 'Такой чат уже существует!'
+          message: 'Чат уже существует!'
         })
       }
 
@@ -29,7 +39,8 @@ module.exports = {
       await User.findByIdAndUpdate(res.locals.userId, { $push: { chats: foundNewChat._id } });
 
       return res.status(200).send({
-        message: 'Новый чат успешно добавлен!'
+        message: 'Чат успешно добавлен!',
+        chat: foundNewChat
       })
     } catch (err) {
       return res.status(403).send({
@@ -38,13 +49,22 @@ module.exports = {
     }
   },
 
-  async connectChat({ body: { name } }, res) {
+  async connectChat(req, res) {
     try {
+      const { name } = req.body;
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(422).json({
+          message: errors.array()[0].msg
+        })
+      }
+      
       const foundChat = await Chat.findOne({ name });
       
       if (!foundChat) {
         return res.status(422).send({
-          message: 'Чата не существует!'
+          message: 'Чат не существует!'
         })
       }
 
@@ -57,7 +77,8 @@ module.exports = {
       } else {
         await User.findByIdAndUpdate(res.locals.userId, { $push: { chats: foundChat._id } });
         return res.status(200).send({
-          message: 'Вы подключены к чату!'
+          message: 'Вы подключены к чату!',
+          chat: foundChat
         });
       }
     } catch (err) {

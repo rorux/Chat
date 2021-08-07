@@ -10,25 +10,26 @@
       <v-row class="mb-2">
         <v-col class="text-center">
           <v-avatar size="120"><img src="/avatar-1.jpg" /></v-avatar>
+          <h3 class="text-capitalize mt-1 blue--text text--lighten-4">
+            {{ login }}
+          </h3>
         </v-col>
       </v-row>
       <v-row justify="space-around" class="mb-5">
-        <v-btn tile color="success">
-          <v-icon left> mdi-plus-thick </v-icon>
-          Новый чат
-        </v-btn>
+        <NewChat />
       </v-row>
       <v-row justify="space-around" class="mb-2">
-        <v-btn tile color="info">
-          <v-icon left> mdi-magnify </v-icon>
-          Найти чат
-        </v-btn>
+        <ConnectChat />
       </v-row>
       <v-row justify="space-around"
         ><v-col>
           <v-select
+            v-model="activeChat"
             v-if="chats.length"
             :items="chats"
+            item-text="name"
+            item-value="_id"
+            return-object
             label="Доступные чаты"
             outlined
             dense
@@ -81,16 +82,32 @@
           >Чат с коллегами</span
         ></v-toolbar-title
       >
+      <v-spacer></v-spacer>
+      <v-tooltip left>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            depressed
+            v-bind="attrs"
+            v-on="on"
+            color="transparent"
+            @click="logout"
+          >
+            <v-icon color="white">exit_to_app</v-icon>
+          </v-btn>
+        </template>
+        <span>Выйти</span>
+      </v-tooltip>
     </v-app-bar>
   </div>
 </template>
 
 <script>
+import { mapState, mapActions } from "vuex";
+import NewChat from "@/components/NewChat";
+import ConnectChat from "@/components/ConnectChat";
 export default {
   data: () => ({
     drawer: null,
-    /* chats: [], */
-    chats: ["Коллеги", "Семья", "Волейбол", "Шахматы"],
     /* usersOnline: [], */
     usersOnline: [
       {
@@ -108,5 +125,16 @@ export default {
       },
     ],
   }),
+  computed: {
+    ...mapState("user", ["login", "chats"]),
+    ...mapState("chat", ["activeChat"]),
+  },
+  methods: {
+    ...mapActions("auth", ["logout"]),
+  },
+  components: {
+    NewChat,
+    ConnectChat,
+  },
 };
 </script>

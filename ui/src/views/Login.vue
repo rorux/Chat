@@ -94,8 +94,7 @@ export default {
           login: this.login,
           password: this.password,
         };
-        const result = await this.authorization(userData);
-        if (result) this.$router.push("/");
+        await this.authorization(userData);
       }
     },
     clear() {

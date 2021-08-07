@@ -87,15 +87,14 @@ export default {
     password: "",
   }),
   methods: {
-    async submit () {
+    async submit() {
       const isValid = await this.$refs.observer.validate();
       if (isValid) {
         const userData = {
           login: this.login,
           password: this.password,
         };
-        const result = await this.register(userData);
-        if(result) this.$router.push("/login");
+        await this.register(userData);
       }
     },
     clear() {

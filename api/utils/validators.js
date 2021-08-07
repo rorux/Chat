@@ -17,3 +17,13 @@ exports.authValidator = [
   .withMessage('Пароль от 2 до 10 символов!')
   .trim(),
 ];
+
+exports.chatValidator = [
+  body('name')
+  .isLength({
+    min: 3,
+    max: 20
+  })
+  .withMessage('Название от 3 до 20 символов!')
+  .trim(),
+];
