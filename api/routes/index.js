@@ -1,4 +1,4 @@
 module.exports = {
-  routes: ['auth', 'user'],
+  routes: ['auth', 'user', 'chat', 'message'],
 };
   

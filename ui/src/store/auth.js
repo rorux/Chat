@@ -4,7 +4,7 @@ import router from '@/router';
 export default {
   namespaced: true,
   actions: {
-    async register({commit}, data) {
+    async register({ commit }, data) {
       try {
         const res = await axios({
           method: 'post',
@@ -20,7 +20,7 @@ export default {
       }
     },
 
-    async authorization({commit}, data) {
+    async authorization({ commit }, data) {
       try {
         const res = await axios({
           method: 'post',
@@ -37,7 +37,7 @@ export default {
       }
     },
 
-    async logout({commit}, data) {
+    async logout({ commit }, data) {
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         const res = await axios({
@@ -58,7 +58,7 @@ export default {
       }
     },
 
-    async refreshToken({commit}, data) {
+    async refreshToken({ commit }, data) {
       try {
         const res = await axios({
           method: 'post',

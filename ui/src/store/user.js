@@ -18,7 +18,7 @@ export default {
     },
   },
   actions: {
-    async getUserInfo({commit}, data) {
+    async getUserInfo({ commit }, data) {
       try {
         const res = await axiosApiInstance({
           method: 'get',
@@ -30,7 +30,7 @@ export default {
       }
     },
 
-    async newChat({commit}, data) {
+    async newChat({ commit }, data) {
       try {
         const res = await axiosApiInstance({
           method: data.type,

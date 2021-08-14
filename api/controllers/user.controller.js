@@ -16,7 +16,7 @@ module.exports = {
 
   async addChat(req, res) {
     try {
-      const { name } = req.body;
+      const { name, owner } = req.body;
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -33,9 +33,9 @@ module.exports = {
         })
       }
 
-      const createdChat = await new Chat({ name });
+      const createdChat = await new Chat({ name, owner });
       await createdChat.save();
-      const foundNewChat = await Chat.findOne({ name });
+      const foundNewChat = await Chat.findOne({ name, owner });
       await User.findByIdAndUpdate(res.locals.userId, { $push: { chats: foundNewChat._id } });
 
       return res.status(200).send({

@@ -27,3 +27,13 @@ exports.chatValidator = [
   .withMessage('Название от 3 до 20 символов!')
   .trim(),
 ];
+
+exports.messageValidator = [
+  body('text')
+  .isLength({
+    min: 1,
+    max: 200
+  })
+  .withMessage('Длина сообщения не более 200 символов!')
+  .trim(),
+];
