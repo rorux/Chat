@@ -1,63 +1,21 @@
 <template>
-  <div style="width: 100%">
-    <v-row class="fill-height">
+  <div style="width: 100%" class="align-self-start pt-4">
+    <v-row v-if="!messages.length">
+      <v-col>
+        <div class="subtitle-1 blue-grey--text text--lighten-1">
+          Сообщений нет..
+        </div>
+        <v-spacer></v-spacer>
+      </v-col>
+    </v-row>
+    <v-row class="fill-height" ref="meswrap" v-else>
       <v-col px-4 py-0>
         <v-sheet class="fill-height px-4 pt-6 pb-10" rounded>
-          <!-- Сообщение админа
-          <v-row>
-            <v-col class="text-center"
-              ><p
-                class="
-                  ma-0
-                  font-weight-light
-                  grey--text
-                  text--lighten-0
-                  font-italic
-                  body-2
-                "
-              >
-                <strong>Николай</strong> вышел из чата..
-              </p></v-col
-            >
-          </v-row> -->
-          <!-- Собственное сообщение
-          <v-row>
-            <v-col class="text-right pt-3 pb-0"
-              ><v-sheet
-                rounded
-                class="
-                  pa-3
-                  pl-4
-                  mes-wrap
-                  d-inline-block
-                  rounded-l-xl
-                  font-weight-light
-                  white--text
-                "
-                color="#04ba16"
-                >Здорово! Норм, у тебя?</v-sheet
-              ></v-col
-            >
-          </v-row> -->
-          <!-- Сообщение собеседника
-          <v-row>
-            <v-col class="py-0">
-              <div class="subtitle-2">Иван</div>
-              <v-sheet
-                rounded
-                class="
-                  pa-3
-                  pr-4
-                  mes-wrap
-                  d-inline-block
-                  rounded-r-xl
-                  font-weight-light
-                "
-                color="#ECECEC"
-                >Привет, как дела?</v-sheet
-              ></v-col
-            >
-          </v-row> -->
+          <Message
+            v-for="message in messages"
+            :key="message._id"
+            :message="message"
+          />
         </v-sheet>
       </v-col>
     </v-row>
@@ -68,7 +26,9 @@
         flat
         hide-details
         solo
-        v-model="text"
+        v-model.trim="text"
+        @keyup.enter.prevent="newMessage"
+        autocomplete="false"
       ></v-text-field>
       <v-btn class="ml-3" fab dark small color="primary" @click="newMessage">
         <v-icon>send</v-icon>
@@ -79,6 +39,7 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import Message from "@/components/Message";
 export default {
   data() {
     return {
@@ -102,8 +63,17 @@ export default {
         this.text = "";
       }
     },
+    scrollToBottom(node) {
+      setTimeout(() => {
+        node.scrollTop = node.scrollHeight;
+      });
+    },
     ...mapActions("message", ["addMessage"]),
   },
+  components: {
+    Message,
+  },
+  mounted() {},
 };
 </script>
 

@@ -55,8 +55,9 @@ export default {
     loading: false,
   }),
   computed: {
-    ...mapState("user", ["login", "chats"]),
+    ...mapState("user", ["login", "chats", "id"]),
     ...mapState("chat", ["activeChat"]),
+    ...mapState("socket", ["userSocketId"]),
     getActiveChat: {
       get() {
         return this.activeChat;
@@ -68,13 +69,31 @@ export default {
   },
   methods: {
     ...mapMutations("chat", ["setActiveChat", "clearActiveChat"]),
+    ...mapMutations("socket", ["setUserSocketId"]),
     ...mapActions("chat", ["getMembers"]),
     ...mapActions("message", ["getMessages"]),
     async onInputActiveChat(selected) {
-      this.setActiveChat(selected);
       this.loading = true;
-      await this.getMembers(selected._id);
-      await this.getMessages(selected._id);
+
+      this.$socket.emit("userLeft", this.userSocketId, async () => {
+        await this.setActiveChat(selected);
+        await this.getMembers(selected._id);
+        await this.getMessages(selected._id);
+
+        const userJoin = {
+          chat: selected._id,
+          login: this.login,
+          user: this.id,
+        };
+        await this.$socket.emit("userJoined", userJoin, (data) => {
+          if (typeof data === "string") {
+            console.error(data);
+          } else {
+            this.setUserSocketId(data.userSocketId);
+          }
+        });
+      });
+
       this.loading = false;
     },
   },

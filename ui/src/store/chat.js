@@ -18,6 +18,15 @@ export default {
     },
     clearMembers(state) {
       state.members = [];
+    },
+    sortMembers(state, usersOnline) {
+      const members = JSON.parse(JSON.stringify(state.members));
+      const membersUpdate = members.map(user => usersOnline.includes(user.id) ? Object.assign(user, { active: true }) : Object.assign(user, { active: false }));
+      const membersSort = membersUpdate.filter(user => user.active);
+      membersUpdate.forEach(user => {
+        if(!user.active) membersSort.push(user);
+      })
+      state.members = membersSort;
     }
   },
   actions: {

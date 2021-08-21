@@ -75,6 +75,8 @@ module.exports = {
       const newMessage = await new Message({ user, chat, text: textRes });
       await newMessage.save();
 
+      newMessage.username = [{ login: foundUser.login }];
+
       return res.status(200).send({
         message: newMessage,
       })

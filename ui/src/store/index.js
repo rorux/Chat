@@ -4,6 +4,7 @@ import auth from './auth';
 import user from './user';
 import chat from './chat';
 import message from './message';
+import socket from './socket';
 
 Vue.use(Vuex);
 
@@ -39,6 +40,7 @@ export default new Vuex.Store({
     auth,
     user,
     chat,
-    message
+    message,
+    socket
   }
 })

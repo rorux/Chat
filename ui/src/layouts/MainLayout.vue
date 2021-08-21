@@ -21,7 +21,8 @@ export default {
     };
   },
   computed: {
-    ...mapState("user", ["chats"]),
+    ...mapState("user", ["chats", "login", "id"]),
+    ...mapState("socket", ["userSocketId"]),
   },
   methods: {
     ...mapActions("user", ["getUserInfo"]),
@@ -33,6 +34,7 @@ export default {
       "clearMembers",
     ]),
     ...mapMutations("message", ["setMessages", "clearMessages"]),
+    ...mapMutations("socket", ["setUserSocketId"]),
   },
   components: {
     Navbar,
@@ -41,9 +43,21 @@ export default {
   async mounted() {
     await this.getUserInfo();
     if (this.chats.length) {
-      this.setActiveChat(this.chats[0]);
-      this.getMembers(this.chats[0]._id);
-      this.getMessages(this.chats[0]._id);
+      await this.setActiveChat(this.chats[0]);
+      await this.getMembers(this.chats[0]._id);
+      await this.getMessages(this.chats[0]._id);
+      const userJoin = {
+        chat: this.chats[0]._id,
+        login: this.login,
+        user: this.id,
+      };
+      this.$socket.emit("userJoined", userJoin, (data) => {
+        if (typeof data === "string") {
+          console.error(data);
+        } else {
+          this.setUserSocketId(data.userSocketId);
+        }
+      });
     } else {
       this.clearActiveChat();
       this.clearMembers();

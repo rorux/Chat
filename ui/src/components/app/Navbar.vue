@@ -18,7 +18,7 @@
           v-bind="attrs"
           v-on="on"
           color="transparent"
-          @click="logout"
+          @click="logoutUser"
         >
           <v-icon color="white">exit_to_app</v-icon>
         </v-btn>
@@ -33,9 +33,15 @@ import { mapState, mapActions } from "vuex";
 export default {
   computed: {
     ...mapState("chat", ["activeChat"]),
+    ...mapState("socket", ["userSocketId"]),
   },
   methods: {
     ...mapActions("auth", ["logout"]),
+    async logoutUser() {
+      this.$socket.emit("userLeft", this.userSocketId, () => {
+        this.logout();
+      });
+    },
   },
 };
 </script>

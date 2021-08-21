@@ -154,7 +154,7 @@ module.exports = {
 
       const foundUser = await User.findOne({ login });
       
-      if (foundUser) {
+      if (foundUser || login === "admin") {
         return res.status(403).send({
           message: 'Данный логин занят!'
         })
