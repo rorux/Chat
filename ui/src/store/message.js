@@ -35,7 +35,7 @@ export default {
           url: process.env.VUE_APP_BACKEND + '/api/v1/message',
           data: JSON.stringify(data)
         });
-        //commit('addMessage', res.data.message);
+        return res.data.message;
       } catch (e) {
         commit('setError', e.response.data.message, {root: true});
         console.log(e);

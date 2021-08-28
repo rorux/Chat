@@ -8,7 +8,7 @@
         <v-spacer></v-spacer>
       </v-col>
     </v-row>
-    <v-row class="fill-height" ref="meswrap" v-else>
+    <v-row class="fill-height" v-else>
       <v-col px-4 py-0>
         <v-sheet class="fill-height px-4 pt-6 pb-10" rounded>
           <Message
@@ -50,6 +50,7 @@ export default {
     ...mapState("chat", ["activeChat"]),
     ...mapState("user", ["id"]),
     ...mapState("message", ["messages"]),
+    ...mapState("socket", ["userSocketId"]),
   },
   methods: {
     async newMessage() {
@@ -59,21 +60,39 @@ export default {
           chat: this.activeChat._id,
           text: this.text,
         };
-        await this.addMessage(req);
-        this.text = "";
+        const sendMessage = await this.addMessage(req);
+        const reqMes = {
+          userId: this.userSocketId,
+          message: sendMessage,
+        };
+        this.$socket.emit("createMessage", reqMes, (data) => {
+          if (typeof data === "string") {
+            console.error(data);
+          } else {
+            this.text = "";
+          }
+        });
       }
-    },
-    scrollToBottom(node) {
-      setTimeout(() => {
-        node.scrollTop = node.scrollHeight;
-      });
     },
     ...mapActions("message", ["addMessage"]),
   },
   components: {
     Message,
   },
-  mounted() {},
+  watch: {
+    messages() {
+      setTimeout(() => {
+        document.querySelector("html").scrollTop =
+          document.querySelector("html").scrollHeight;
+      });
+    },
+  },
+  mounted() {
+    setTimeout(() => {
+      document.querySelector("html").scrollTop =
+        document.querySelector("html").scrollHeight;
+    });
+  },
 };
 </script>
 

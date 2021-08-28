@@ -40,6 +40,13 @@ const routes = [
     component: () => import('../views/Home.vue'),
     beforeEnter: ifAuthenticated,
   },
+  {
+    path: '/settings',
+    name: 'settings',
+    meta: {layout: 'page', auth: true},
+    component: () => import('../views/Settings.vue'),
+    beforeEnter: ifAuthenticated,
+  },
 ]
 
 const router = new VueRouter({

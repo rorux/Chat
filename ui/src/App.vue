@@ -10,6 +10,7 @@
 <script>
 import EmptyLayout from "@/layouts/EmptyLayout";
 import MainLayout from "@/layouts/MainLayout";
+import PageLayout from "@/layouts/PageLayout";
 import Alert from "@/components/app/Alert";
 export default {
   computed: {
@@ -20,6 +21,7 @@ export default {
   components: {
     EmptyLayout,
     MainLayout,
+    PageLayout,
     Alert,
   },
 };

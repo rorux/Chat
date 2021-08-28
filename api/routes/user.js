@@ -6,6 +6,7 @@ const { chatValidator } = require('../utils/validators');
 router.use(auth.checkToken);
 
 router.get("/", user.getInfo);
+router.get("/chat", user.getChatsOwner);
 router.post("/chat", chatValidator, user.addChat);
 router.put("/chat", chatValidator, user.connectChat);
 router.delete("/chat/:id", user.removeChat);

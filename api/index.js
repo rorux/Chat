@@ -36,6 +36,41 @@ const io = socketIO(server, {
 });
 
 io.on('connection', socket => {
+  socket.on('newMemberConnected', (data, cb) => {
+    if (!data.login || !data.user || !data.chat) {
+      return cb('Данные некорректны')
+    }
+    const newMember = {
+      active: true,
+      id: data.user,
+      login: data.login
+    }
+    io.to(data.chat).emit('newMemberConnected', newMember);
+  })
+  
+  socket.on('userDisconnectChat', (data, cb) => {
+    if (!data.login || !data.user || !data.chat) {
+      return cb('Данные некорректны')
+    }
+    socket.broadcast
+      .to(data.chat)
+      .emit('newMessage', {
+        chat: data.chat,
+        text: `${data.login} удалился из чата...`,
+        username: [{ login: 'admin' }]
+      })
+    io.to(data.chat).emit('userRemovedChat', data);
+  })
+
+  socket.on('deleteChat', (data, cb) => {
+    if (!data.chat) {
+      return cb('Данные некорректны')
+    }
+    socket.broadcast
+      .to(data.chat)
+      .emit('deleteChatByOwner', data.chat)
+  })
+
   socket.on('userJoined', (data, cb) => {
     if (!data.login || !data.user || !data.chat) {
       return cb('Данные некорректны')
@@ -62,6 +97,25 @@ io.on('connection', socket => {
       })
   })
 
+  socket.on('createMessage', (data, cb) => {
+    if (
+      !data.userId ||
+      !data.message.text ||
+      !data.message._id ||
+      !data.message.user ||
+      !data.message.chat ||
+      !data.message.date
+    ) {
+      return cb('Ошибка!')
+    }
+
+    const user = users.get(data.userId);
+    if (user) {
+      io.to(user.chat).emit('newMessage', data.message)
+    }
+    cb();
+  })
+
   socket.on('userLeft', (id, cb) => {
     const user = users.remove(id)
     if (user) {
@@ -81,7 +135,7 @@ io.on('connection', socket => {
       socket.leave(user.chat);
       io.to(user.chat).emit('updateUsersOnline', users.getByChat(user.chat));
       io.to(user.chat).emit('newMessage', {
-        text: `${user.login} вышел из чата...`,
+        text: `${user.login} покинул чат...`,
         username: [{ login: 'admin' }]
       });
     }

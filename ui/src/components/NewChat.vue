@@ -53,7 +53,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("user", ["id"]),
+    ...mapState("user", ["login", "chats", "id"]),
   },
   methods: {
     async submit() {
@@ -67,6 +67,24 @@ export default {
           type: "post",
         });
         if (res) {
+          await this.setActiveChat(res);
+          await this.getMembers(res._id);
+          await this.getMessages(res._id);
+
+          const userJoin = {
+            chat: res._id,
+            login: this.login,
+            user: this.id,
+          };
+
+          await this.$socket.emit("userJoined", userJoin, (data) => {
+            if (typeof data === "string") {
+              console.error(data);
+            } else {
+              this.setUserSocketId(data.userSocketId);
+            }
+          });
+
           this.dialog = false;
         }
         this.loading = false;
@@ -74,6 +92,8 @@ export default {
       }
     },
     ...mapActions("user", ["newChat"]),
+    ...mapActions("chat", ["setActiveChat", "getMembers"]),
+    ...mapActions("message", ["getMessages"]),
   },
 };
 </script>

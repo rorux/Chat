@@ -11,7 +11,23 @@
       }}</span></v-toolbar-title
     >
     <v-spacer></v-spacer>
-    <v-tooltip left>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          depressed
+          v-bind="attrs"
+          v-on="on"
+          color="transparent"
+          @click="toSettings"
+          small
+          fab
+        >
+          <v-icon color="white" small>mdi-wrench</v-icon>
+        </v-btn>
+      </template>
+      <span>Опции</span>
+    </v-tooltip>
+    <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
         <v-btn
           depressed
@@ -19,6 +35,8 @@
           v-on="on"
           color="transparent"
           @click="logoutUser"
+          small
+          fab
         >
           <v-icon color="white">exit_to_app</v-icon>
         </v-btn>
@@ -37,9 +55,14 @@ export default {
   },
   methods: {
     ...mapActions("auth", ["logout"]),
-    async logoutUser() {
+    logoutUser() {
       this.$socket.emit("userLeft", this.userSocketId, () => {
         this.logout();
+      });
+    },
+    toSettings() {
+      this.$socket.emit("userLeft", this.userSocketId, () => {
+        this.$router.push("/settings");
       });
     },
   },

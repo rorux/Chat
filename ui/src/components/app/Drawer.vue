@@ -68,30 +68,52 @@ export default {
     },
   },
   methods: {
-    ...mapMutations("chat", ["setActiveChat", "clearActiveChat"]),
+    ...mapMutations(["setError"]),
+    ...mapMutations("chat", ["clearActiveChat", "clearMembers"]),
     ...mapMutations("socket", ["setUserSocketId"]),
-    ...mapActions("chat", ["getMembers"]),
+    ...mapMutations("message", ["clearMessages"]),
+    ...mapMutations("user", ["removeChat"]),
+    ...mapActions("chat", ["setActiveChat", "getMembers", "getChat"]),
     ...mapActions("message", ["getMessages"]),
     async onInputActiveChat(selected) {
       this.loading = true;
 
       this.$socket.emit("userLeft", this.userSocketId, async () => {
-        await this.setActiveChat(selected);
-        await this.getMembers(selected._id);
-        await this.getMessages(selected._id);
+        const checkChat = await this.getChat(selected._id);
+        if (checkChat) {
+          if (checkChat._id && checkChat._id === selected._id) {
+            await this.setActiveChat(selected);
+            await this.getMembers(selected._id);
+            await this.getMessages(selected._id);
 
-        const userJoin = {
-          chat: selected._id,
-          login: this.login,
-          user: this.id,
-        };
-        await this.$socket.emit("userJoined", userJoin, (data) => {
-          if (typeof data === "string") {
-            console.error(data);
+            const userJoin = {
+              chat: selected._id,
+              login: this.login,
+              user: this.id,
+            };
+            await this.$socket.emit("userJoined", userJoin, (data) => {
+              if (typeof data === "string") {
+                console.error(data);
+              } else {
+                this.setUserSocketId(data.userSocketId);
+              }
+            });
           } else {
-            this.setUserSocketId(data.userSocketId);
+            this.clearActiveChat();
+            localStorage.removeItem("activeChat");
+            this.clearMembers();
+            this.clearMessages();
+            this.removeChat(selected._id);
+            this.setError("Чат не существует!");
           }
-        });
+        } else {
+          this.clearActiveChat();
+          localStorage.removeItem("activeChat");
+          this.clearMembers();
+          this.clearMessages();
+          this.removeChat(selected._id);
+          this.setError("Чат не существует!");
+        }
       });
 
       this.loading = false;

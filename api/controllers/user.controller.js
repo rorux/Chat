@@ -14,6 +14,17 @@ module.exports = {
     }
   },
 
+  async getChatsOwner(req, res) {
+    try {
+      const chats = await Chat.find({ owner: res.locals.userId });
+      return res.status(200).send({ chats });
+    } catch (err) {
+      return res.status(403).send({
+        message: 'Что-то пошло не так..'
+      })
+    }
+  },
+
   async addChat(req, res) {
     try {
       const { name, owner } = req.body;
@@ -60,7 +71,7 @@ module.exports = {
         })
       }
       
-      const foundChat = await Chat.findOne({ name });
+      const foundChat = await Chat.findOne({ name: new RegExp('^' + name + '$', 'i') });
       
       if (!foundChat) {
         return res.status(422).send({

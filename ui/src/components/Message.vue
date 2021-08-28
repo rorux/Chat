@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%">
+  <div class="message-wrap">
     <v-row v-if="author === 'me'">
       <v-col class="text-right pt-3 pb-0 my-3"
         ><v-sheet
@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState } from "vuex";
 export default {
   props: {
     message: {
@@ -81,4 +81,7 @@ export default {
 </script>
 
 <style>
+.message-wrap {
+  width: 100%;
+}
 </style>

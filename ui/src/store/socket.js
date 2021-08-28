@@ -13,8 +13,17 @@ export default {
     }
   },
   actions: {
-    async SOCKET_newMessage({ commit }, message) {
+    SOCKET_newMessage({ commit }, message) {
       commit('message/addMessage', message, {root: true});
+    },
+    SOCKET_newMemberConnected({ commit }, member) {
+      commit('chat/newMember', member, {root: true});
+    },
+    SOCKET_userRemovedChat({ commit }, user) {
+      commit('chat/delMember', user.user, {root: true});
+    },
+    SOCKET_deleteChatByOwner({ dispatch }, chatId) {
+      dispatch('chat/deleteChatByOwner', chatId, {root: true});
     },
   },
 }

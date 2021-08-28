@@ -48,11 +48,13 @@ export default {
         });
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('activeChat');
         commit('setSuccess', res.data.message, {root: true});
         router.push('/login');
       } catch (e) {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('activeChat');
         router.push('/login');
         throw e;
       }
