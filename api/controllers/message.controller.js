@@ -70,16 +70,34 @@ module.exports = {
         })
       }
 
-      const textRes = htmlspecialchars(text);
+      let countMessages = 0;
+      await Message.countDocuments({ chat }, function(err, count) {
+        countMessages = count;
+      });
 
-      const newMessage = await new Message({ user, chat, text: textRes });
-      await newMessage.save();
+      if(countMessages < 100) {
+        const textRes = htmlspecialchars(text);
 
-      const newMessageReq = Object.assign(JSON.parse(JSON.stringify(newMessage)), { username: [{ login: foundUser.login }] });
+        const newMessage = await new Message({ user, chat, text: textRes });
+        await newMessage.save();
 
-      return res.status(200).send({
-        message: newMessageReq,
-      })
+        const newMessageReq = Object.assign(JSON.parse(JSON.stringify(newMessage)), { username: [{ login: foundUser.login }] });
+        return res.status(200).send({
+          message: newMessageReq,
+        })
+      } else {
+        const newMessageReq = {
+          text: 'Не более 100 сообщений...',
+          _id: '1',
+          date: Date.now().toString(),
+          chat: chat,
+          user: user,
+          username: [{ login: 'admin' }]
+        };
+        return res.status(200).send({
+          message: newMessageReq,
+        })
+      }
 
     } catch (err) {
       return res.status(403).send({

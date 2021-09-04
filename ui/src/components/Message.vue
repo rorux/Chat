@@ -14,7 +14,10 @@
             white--text
           "
           color="#04ba16"
-          >{{ message.text }}</v-sheet
+          ><div class="caption text-right green--text text--lighten-3">
+            {{ humanDate }}
+          </div>
+          {{ message.text }}</v-sheet
         ></v-col
       >
     </v-row>
@@ -32,7 +35,10 @@
             font-weight-light
           "
           color="#ECECEC"
-          >{{ message.text }}</v-sheet
+          ><div class="caption text-left grey--text">
+            {{ humanDate }}
+          </div>
+          {{ message.text }}</v-sheet
         ></v-col
       >
     </v-row>
@@ -74,6 +80,9 @@ export default {
       } else if (this.message.user === this.id) {
         return "me";
       } else return "friend";
+    },
+    humanDate() {
+      return new Date(Date.parse(this.message.date)).toLocaleString("ru-RU");
     },
   },
   mounted() {},
