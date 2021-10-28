@@ -93,4 +93,7 @@ export default {
 .message-wrap {
   width: 100%;
 }
+.mes-wrap {
+  word-wrap: break-word;
+}
 </style>

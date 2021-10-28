@@ -30,6 +30,7 @@ const io = socketIO(server, {
   cors: {
     origin: process.env.VUE_APP_FRONTEND,
     methods: ["GET", "POST"],
+    transports: ['websocket', 'polling'],
     credentials:true
   },
   allowEIO3: true
