@@ -1,0 +1,18 @@
+{
+  "name": "chat",
+  "version": "1.0.0",
+  "description": "Vue2 + Node + MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "devApi": "cd api/ && npm run start",
+    "devUi": "cd ui/ && npm run serve",
+    "install_modules": "npm i && cd ui/ && npm i && cd ../api && npm i && cd ../",
+    "launch_app_dev": "npm-run-all --parallel devUi devApi"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
